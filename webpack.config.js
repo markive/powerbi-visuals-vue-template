@@ -3,9 +3,9 @@ const fs = require("fs");
 
 // werbpack plugin
 const webpack = require("webpack");
-const PowerBICustomVisualsWebpackPlugin = require('powerbi-visuals-webpack-plugin');
+const { PowerBICustomVisualsWebpackPlugin } = require('powerbi-visuals-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const Visualizer = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
 const { VueLoaderPlugin } = require("vue-loader");
 
@@ -29,38 +29,39 @@ const statsLocation = "../../webpack.statistics.html";
 
 // babel options to support IE11
 let babelOptions = {
-    "presets": [
+    presets: [
         [
             require.resolve('@babel/preset-env'),
             {
+                "targets": {
+                    "ie": "11"
+                },
                 useBuiltIns: "entry",
                 corejs: 3,
                 modules: false
             }
-        ]
-    ],
-    plugins: [
-        [
-            require.resolve('babel-plugin-module-resolver'),
-            {
-                root: ['./'],
-            },
         ],
+        "@babel/preset-react" // required for jsx files
     ],
     sourceType: "unambiguous", // tell to babel that the project can contains different module types, not only es2015 modules
-    cacheDirectory: path.join(".tmp", "babelCache") // path for chace files
+    cacheDirectory: path.join(".tmp", "babelCache") // path for cache files
 };
 
+const isProduction = true
 module.exports = {
     entry: {
-        "visual": pluginLocation,
+        "visual.js": pluginLocation,
     },
+    target: "web",
     optimization: {
-        concatenateModules: false,
-        minimize: true // enable minimization for create *.pbiviz file less than 2 Mb, can be disabled for dev mode
+        minimize: isProduction, // enable minimization for create *.pbiviz file less than 2 Mb, can be disabled for dev mode
+    },
+    performance: {
+        maxEntrypointSize: 1024000,
+        maxAssetSize: 1024000
     },
     devtool: 'source-map',
-    mode: "development",
+    mode: isProduction ? "production" : "development",
     module: {
         rules: [
             {
@@ -117,12 +118,23 @@ module.exports = {
             },
             {
                 test: /\.json$/,
-                loader: require.resolve('json-loader'),
+                // loader: require.resolve('json-loader'),
+                loader: 'json-loader',
                 type: "javascript/auto"
             },
             {
-                test: /\.(css|scss)?$/,
-                use: [require.resolve('style-loader'), require.resolve('css-loader'), require.resolve('sass-loader')],
+                test: /(\.scss)|(\.css)$/,
+                use: [
+                    {
+                        loader: MiniCssExtractPlugin.loader
+                    },
+                    {
+                        loader: 'css-loader'
+                    },
+                    {
+                        loader: 'sass-loader',
+                    }
+                ]
             },
             {
                 test: /\.(woff|ttf|ico|woff2|jpg|jpeg|png|webp|svg)$/i,
@@ -136,14 +148,14 @@ module.exports = {
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.jsx', '.js', '.css'],
-        alias: {
-        },
     },
     output: {
-        publicPath: '/assets',
-        path: path.join(__dirname, "/.tmp", "drop"),
-        library: +powerbiApi.version.replace(/\./g, "") >= 320 ? pbivizFile.visual.guid : undefined,
-        libraryTarget: +powerbiApi.version.replace(/\./g, "") >= 320 ? 'var' : undefined,
+        clean: true,
+        path: path.join(__dirname, ".tmp", "drop"),
+        publicPath: 'assets',
+        filename: "[name]",
+        library: pbivizFile.visual.guid,
+        libraryTarget: "var",
     },
     devServer: {
         static: false,
@@ -157,26 +169,20 @@ module.exports = {
             "access-control-allow-origin": "*",
             "cache-control": "public, max-age=0"
         },
-        hot: false
+        hot: false,
+        allowedHosts: "all",
+        static: path.join(__dirname, ".tmp", "drop"),
     },
-    externals: powerbiApi.version.replace(/\./g, "") >= 320 ?
-        {
-            "powerbi-visuals-api": 'null',
-            "fakeDefine": 'false',
-        } :
-        {
-            "powerbi-visuals-api": 'null',
-            "fakeDefine": 'false',
-            "corePowerbiObject": "Function('return this.powerbi')()",
-            "realWindow": "Function('return this')()"
-        },
+    externals: {
+        "powerbi-visuals-api": 'null',
+    },
     plugins: [
         new VueLoaderPlugin(),
         new MiniCssExtractPlugin({
             filename: "visual.css",
             chunkFilename: "[id].css"
         }),
-        new Visualizer({
+        new BundleAnalyzerPlugin({
             reportFilename: statsLocation,
             openAnalyzer: false,
             analyzerMode: `static`
@@ -205,7 +211,7 @@ module.exports = {
             dependenciesSchema: powerbiApi.schemas.dependencies,
             devMode: false,
             generatePbiviz: true,
-            generateResources: true,
+            generateResources: isProduction,
             modules: true,
             visualSourceLocation: "../../src/visual",
             pluginLocation: pluginLocation,
@@ -217,14 +223,8 @@ module.exports = {
                 capabilitiesPath
             ]
         }),
-        powerbiApi.version.replace(/\./g, "") >= 320 ?
-            new webpack.ProvidePlugin({
-                define: 'fakeDefine',
-            }) :
-            new webpack.ProvidePlugin({
-                window: 'realWindow',
-                define: 'fakeDefine',
-                powerbi: 'corePowerbiObject'
-            })
+        new webpack.ProvidePlugin({
+            define: 'fakeDefine',
+        })
     ]
 };
