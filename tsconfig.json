@@ -1,31 +1,40 @@
 {
     "compilerOptions": {
-        "allowJs": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "target": "es6",
-        "sourceMap": true,
-        "outDir": "./.tmp/build/",
-        "moduleResolution": "node",
-        "declaration": true,
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "isolatedModules": true,
-        "lib": [
-            "es2015",
-            "dom"
-        ],
-        "jsx": "react",
-        "baseUrl": "./",
-        "paths": {
-            "plotly-js-editor": ["./../react-chart-editor/src"],
-        }
+      "allowJs": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "target": "es6",
+      "sourceMap": true,
+      "outDir": "./.tmp/build/",
+      "moduleResolution": "node",
+      "declaration": true,
+      "allowSyntheticDefaultImports": true,
+      "esModuleInterop": true,
+      "isolatedModules": true,
+      "lib": [
+        "es2015",
+        "dom"
+      ],
+      "jsx": "react",
+      "baseUrl": "./",
+      "paths": {
+        "@/*": ["src/*"]
+      },
+      "typeRoots": [
+        "node_modules/@types",
+        "src"
+      ],
+      "types": [
+        "node"
+      ]
     },
     "files": [
-        "src/visual.ts",
+      "src/visual.ts"
     ],
     "include": [
-        "src/shims-vue.d.ts",
-        "src/**/*.vue",
-    ],
-}
+      "src/shims-vue.d.ts",
+      "src/shims-vuetify.d.ts",
+      "src/**/*.vue",
+      "src/**/*.js"
+    ]
+  }

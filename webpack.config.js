@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require("fs");
 
-// werbpack plugin
+// webpack plugin
 const webpack = require("webpack");
 const PowerBICustomVisualsWebpackPlugin = require('powerbi-visuals-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -122,7 +122,16 @@ module.exports = {
             },
             {
                 test: /\.(css|scss)?$/,
-                use: [require.resolve('style-loader'), require.resolve('css-loader'), require.resolve('sass-loader')],
+                use: [
+                    require.resolve('style-loader'),
+                    require.resolve('css-loader'),
+                    {
+                        loader: require.resolve('sass-loader'),
+                        options: {
+                            implementation: require('sass'),
+                        },
+                    },
+                ],
             },
             {
                 test: /\.(woff|ttf|ico|woff2|jpg|jpeg|png|webp|svg)$/i,
@@ -137,6 +146,8 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.jsx', '.js', '.css'],
         alias: {
+            vue$: 'vue/dist/vue.esm-bundler.js',
+            '@': path.resolve(__dirname, 'src'),
         },
     },
     output: {

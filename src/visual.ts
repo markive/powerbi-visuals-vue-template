@@ -1,6 +1,7 @@
 "use strict";
 
-import "../style/visual.scss";
+//import "../style/visual.scss";
+import "./style/vuetify-styles.scss";
 import "core-js/stable";
 import powerbiVisualsApi from "powerbi-visuals-api";
 import VisualConstructorOptions = powerbiVisualsApi.extensibility.visual.VisualConstructorOptions;
@@ -15,6 +16,7 @@ import { VisualSettings } from "./settings";
 import { createApp } from "vue";
 
 import Count from './Count.vue';
+import vuetify from './vuetify'; // Import the Vuetify plugin
 
 export class Visual implements IVisual {
     private target: HTMLElement;
@@ -24,6 +26,7 @@ export class Visual implements IVisual {
         this.target = options.element;
         if (document) {
             const vueApp = createApp(Count);
+            vueApp.use(vuetify); // Use Vuetify
             vueApp.mount(this.target);
         }
     }
@@ -35,7 +38,6 @@ export class Visual implements IVisual {
     private static parseSettings(dataView: DataView): VisualSettings {
         return VisualSettings.parse(dataView);
     }
-
 
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
         return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
