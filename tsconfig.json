@@ -18,14 +18,22 @@
         "jsx": "react",
         "baseUrl": "./",
         "paths": {
-            "plotly-js-editor": ["./../react-chart-editor/src"],
-        }
+            "@/*": ["src/*"]
+        },
+        "typeRoots": [
+            "./node_modules/@types",
+            "./node_modules/@vueutify",
+            "src"
+        ],
+        "types": ["node"]
     },
     "files": [
         "src/visual.ts",
     ],
     "include": [
         "src/shims-vue.d.ts",
+        "src/plugins/shims-vuetify.d.ts",
         "src/**/*.vue",
+        "src/**/*.js",
     ],
 }

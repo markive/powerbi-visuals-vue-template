@@ -13,8 +13,10 @@ import VisualObjectInstanceEnumerationObject = powerbiVisualsApi.VisualObjectIns
 
 import { VisualSettings } from "./settings";
 import { createApp } from "vue";
+import vuetify from './plugins/vuetify';
 
-import Count from './Count.vue';
+// import Count from './Count.vue';
+import MainApp from './MainApp.vue';
 
 export class Visual implements IVisual {
     private target: HTMLElement;
@@ -23,7 +25,8 @@ export class Visual implements IVisual {
     constructor(options: VisualConstructorOptions) {
         this.target = options.element;
         if (document) {
-            const vueApp = createApp(Count);
+            const vueApp = createApp(MainApp);
+            vueApp.use(vuetify);
             vueApp.mount(this.target);
         }
     }

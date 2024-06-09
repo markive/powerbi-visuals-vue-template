@@ -1,4 +1,4 @@
-   
+
 {
     "author": {
       "name": "Akvelon Inc",
@@ -14,7 +14,7 @@
       "supportUrl": "http://akvelon.com/feedback",
       "gitHubUrl": "https://github.com/akvelon"
     },
-    "apiVersion": "3.8.0",
+    "apiVersion": "4.7.0",
     "assets": {
       "icon": "assets/icon.svg"
     },

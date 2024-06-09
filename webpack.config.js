@@ -8,6 +8,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
 const { VueLoaderPlugin } = require("vue-loader");
+const { VuetifyPlugin } = require('webpack-plugin-vuetify')
+
 
 // api configuration
 const powerbiApi = require("powerbi-visuals-api");
@@ -33,15 +35,24 @@ let babelOptions = {
         [
             require.resolve('@babel/preset-env'),
             {
-                "targets": {
-                    "ie": "11"
-                },
+                // "targets": {
+                //     "ie": "11"
+                // },
                 useBuiltIns: "entry",
                 corejs: 3,
                 modules: false
             }
         ],
-        "@babel/preset-react" // required for jsx files
+        // "@babel/preset-react" // required for jsx files
+    ],
+    plugins: [
+        [
+            require.resolve('babel-plugin-module-resolver'),
+            {
+                root: ['./'],
+            },
+        ],
+        // "@babel/preset-react" // required for jsx files
     ],
     sourceType: "unambiguous", // tell to babel that the project can contains different module types, not only es2015 modules
     cacheDirectory: path.join(".tmp", "babelCache") // path for cache files
@@ -147,7 +158,13 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.tsx', '.ts', '.jsx', '.js', '.css'],
+        extensions: ['.tsx', '.ts', '.jsx', '.js', '.vue', '.json', '.css'],
+        alias: {
+            // 'vue$': 'vue/dist/vue.esm.js',
+            'vue$': 'vue/dist/vue.esm-bundler.js',
+            // 'vuetify': 'vuetify/lib',
+            '@': path.resolve(__dirname, 'src'),
+        }
     },
     output: {
         clean: true,
@@ -178,6 +195,7 @@ module.exports = {
     },
     plugins: [
         new VueLoaderPlugin(),
+        new VuetifyPlugin({ autoImport: true }),
         new MiniCssExtractPlugin({
             filename: "visual.css",
             chunkFilename: "[id].css"
